@@ -11,6 +11,7 @@ from .duml import (
     MODEL_NAMES,
     PORT_SWITCH_RULE,
     parse_recharge_modes,
+    parse_light,
 )
 
 
@@ -27,6 +28,7 @@ class ModelFeature(StrEnum):
     USB_CONTROLS = "usb_controls"
     RESERVE_CONTROL = "reserve_control"
     RECHARGE_MODE = "recharge_mode"
+    LIGHT_CONTROLS = "light_controls"
 
 
 _KNOWN_MODELS = frozenset(MODEL_NAMES.values())
@@ -56,6 +58,8 @@ def feature_available(data: dict, feature: ModelFeature) -> bool:
     """Apply the known record and station-rule gates for an optional feature."""
     if feature == ModelFeature.RECHARGE_MODE:
         return parse_recharge_modes(data.get("key_1e")) is not None
+    if feature == ModelFeature.LIGHT_CONTROLS:
+        return parse_light(data.get("key_1b")) is not None
     if feature == ModelFeature.RESERVE_CONTROL:
         return data.get("energy_reserve_available") is True
     if feature == ModelFeature.TARIFF_SCHEDULE:
