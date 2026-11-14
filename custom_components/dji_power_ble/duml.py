@@ -61,6 +61,7 @@ TIME_PERIODS_KEY = 0x16
 ECO_MODE_KEY = 0x18
 RECHARGE_MODE_KEY = 0x1E
 LIGHT_KEY = 0x1B
+LOW_BATTERY_ALARM_KEY = 0x21
 
 # DJI Home requests these optional configuration keys on every station model.
 APP_DISCOVERY_KEYS = (
@@ -1925,4 +1926,27 @@ def build_light_set_payload(
         raw[3] = brightness
     return build_keyed_set_payload(
         [(LIGHT_KEY, bytes(raw)), _SET_STATE_RULES], timestamp_ms=timestamp_ms
+def parse_low_battery_alarm(value: str | bytes | None) -> bool | None:
+    """Return whether the low-battery alarm is on (0x21 byte 1: 1 on, 2 off).
+
+    Byte 2 is the alarm margin: it sounds at the discharge limit plus that many
+    percent (5 on the Power 1000 Mini). It is not written.
+    """
+    raw = _record_bytes(value)
+    if raw is None or len(raw) != 3 or raw[1] not in (1, 2):
+        return None
+    return raw[1] == 1
+
+
+def build_low_battery_alarm_set_payload(
+    current: str | bytes | None, enabled: bool, *, timestamp_ms: int | None = None
+) -> bytes:
+    """Switch the low-battery alarm, keeping the other two bytes."""
+    if parse_low_battery_alarm(current) is None:
+        raise ProtocolError("the station did not report a low-battery alarm setting")
+    raw = bytearray(_record_bytes(current))
+    raw[1] = 1 if enabled else 2
+    return build_keyed_set_payload(
+        [(LOW_BATTERY_ALARM_KEY, bytes(raw)), _SET_STATE_RULES],
+        timestamp_ms=timestamp_ms,
     )

@@ -12,6 +12,7 @@ from .duml import (
     PORT_SWITCH_RULE,
     parse_recharge_modes,
     parse_light,
+    parse_low_battery_alarm,
 )
 
 
@@ -29,6 +30,7 @@ class ModelFeature(StrEnum):
     RESERVE_CONTROL = "reserve_control"
     RECHARGE_MODE = "recharge_mode"
     LIGHT_CONTROLS = "light_controls"
+    LOW_BATTERY_ALARM = "low_battery_alarm"
 
 
 _KNOWN_MODELS = frozenset(MODEL_NAMES.values())
@@ -60,6 +62,8 @@ def feature_available(data: dict, feature: ModelFeature) -> bool:
         return parse_recharge_modes(data.get("key_1e")) is not None
     if feature == ModelFeature.LIGHT_CONTROLS:
         return parse_light(data.get("key_1b")) is not None
+    if feature == ModelFeature.LOW_BATTERY_ALARM:
+        return parse_low_battery_alarm(data.get("key_21")) is not None
     if feature == ModelFeature.RESERVE_CONTROL:
         return data.get("energy_reserve_available") is True
     if feature == ModelFeature.TARIFF_SCHEDULE:

@@ -26,6 +26,7 @@ from .duml import (
     ECO_MODE_KEY,
     RECHARGE_MODE_KEY,
     LIGHT_KEY,
+    LOW_BATTERY_ALARM_KEY,
     ENERGY_STORAGE_KEY,
     EXPANSION_BATTERIES_KEY,
     GATT_LAYOUTS,
@@ -49,6 +50,7 @@ from .duml import (
     build_auto_resume_set_payload,
     build_recharge_mode_set_payload,
     build_light_set_payload,
+    build_low_battery_alarm_set_payload,
     build_car_charger_set_payload,
     build_charge_limits_set_payload,
     build_charge_power_set_payload,
@@ -70,6 +72,7 @@ from .duml import (
     parse_keyed_values,
     parse_recharge_modes,
     parse_light,
+    parse_low_battery_alarm,
     parse_report,
     parse_set_ack,
     parse_telemetry,
@@ -1480,6 +1483,12 @@ class DjiPowerDevice:
                 current, mode=mode, brightness=brightness
             ),
             matches,
+    async def set_low_battery_alarm(self, enabled: bool) -> None:
+        """Switch the low-battery alarm."""
+        await self._write_setting(
+            LOW_BATTERY_ALARM_KEY,
+            lambda current: build_low_battery_alarm_set_payload(current, enabled),
+            lambda value: parse_low_battery_alarm(value) is enabled,
         )
 
     async def set_energy_reserve(
