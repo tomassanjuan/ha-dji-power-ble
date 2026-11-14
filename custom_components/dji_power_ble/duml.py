@@ -1926,6 +1926,9 @@ def build_light_set_payload(
         raw[3] = brightness
     return build_keyed_set_payload(
         [(LIGHT_KEY, bytes(raw)), _SET_STATE_RULES], timestamp_ms=timestamp_ms
+    )
+
+
 def parse_low_battery_alarm(value: str | bytes | None) -> bool | None:
     """Return whether the low-battery alarm is on (0x21 byte 1: 1 on, 2 off).
 

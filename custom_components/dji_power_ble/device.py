@@ -1483,6 +1483,8 @@ class DjiPowerDevice:
                 current, mode=mode, brightness=brightness
             ),
             matches,
+        )
+
     async def set_low_battery_alarm(self, enabled: bool) -> None:
         """Switch the low-battery alarm."""
         await self._write_setting(
